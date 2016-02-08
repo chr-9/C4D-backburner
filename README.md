@@ -4,9 +4,9 @@
 ・Program Files\MAXON\CINEMA 4D R16\library\scripts\にbackburner.pyと C4D_bb.exeをコピー  
 
 ## 使い方
-① ネットワークへ共有したフォルダに素材と一緒にプロジェクト保存  
-② スクリプト>ユーザースクリプト>backburnerを実行  
-③ ネットワークパスへの置換を設定 (D:\ > \\CHIGIRA\ 等)  
+1. ネットワークへ共有したフォルダに素材と一緒にプロジェクト保存  
+2. スクリプト>ユーザースクリプト>backburnerを実行  
+3. ネットワークパスへの置換を設定 (D:\ > \\CHIGIRA\ 等)  
   
 ジョブの確認はモニターから出来ます。  
 
