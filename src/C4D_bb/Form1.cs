@@ -34,13 +34,13 @@ namespace C4D_bb
         {
             server_ip = (string)regkey.GetValue("server_ip", "");
             if (server_ip == "")
-                server_ip = "192.168.0.12";
+                server_ip = "192.168.1.40";
             server_group = (string)regkey.GetValue("server_group", "");
             if (server_group == "")
                 server_group = "RENDER";
             server_c4dloc = (string)regkey.GetValue("server_c4dloc", "");
             if (server_c4dloc == "")
-                server_c4dloc = @"C:\Program Files\MAXON\CINEMA 4D R14\CINEMA 4D 64 Bit.exe";
+                server_c4dloc = @"C:\Program Files\MAXON\CINEMA 4D R17\CINEMA 4D.exe";
             server_count = (string)regkey.GetValue("server_count", "");
             if (server_count == "")
                 server_count = "5";
@@ -95,6 +95,8 @@ namespace C4D_bb
                 {
                     mp = true;
                 }
+
+                checkBox1.Checked = mp;
 
                 path = args[1].Replace(fstr, rstr);
                 textBox11.Text = path;
@@ -220,9 +222,10 @@ namespace C4D_bb
             addCmd("priority " + priority);
             addCmd("serverCount " + server_count);
             addCmd("group \"" + server_group + "\"");
-            #if DEBUG
+            addCmd("timeout 2880");  // 2days
+#if DEBUG
                 addCmd("suspended");
-            #endif
+#endif
 
             if (!Directory.Exists(saveDir))
                 Directory.CreateDirectory(saveDir);
@@ -631,6 +634,11 @@ namespace C4D_bb
         private void textBox12_TextChanged(object sender, EventArgs e)
         {
             label14.Text = saveDir.Replace(textBox12.Text, textBox13.Text);
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            mp = checkBox1.Checked;
         }
     }
 }

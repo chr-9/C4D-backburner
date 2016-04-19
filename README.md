@@ -1,25 +1,12 @@
 ﻿# C4D-backburner-winGUI
 
+## 概要
+C4DからBackburnerへジョブを投げるスクリプト
+
 ## 導入
-・Program Files\MAXON\CINEMA 4D R16\library\scripts\にbackburner.pyと C4D_bb.exeをコピー  
+/Program Files/MAXON/CINEMA 4D R??/library/scripts/ へ backburner.py と C4D_bb.exe をコピー
 
 ## 使い方
 1. ネットワークへ共有したフォルダに素材と一緒にプロジェクト保存  
 2. スクリプト>ユーザースクリプト>backburnerを実行  
-3. ネットワークパスへの置換を設定 (D:\ > \\CHIGIRA\ 等)  
-  
-ジョブの確認はモニターから出来ます。  
-
-
-## 更新履歴
-2015/11/11  
-・開始フレームが反映されない不具合修正  
-・スクリプトから投げた際に保存先が置換されない不具合修正  
-2015/10/08  
-・C4D 用スクリプト作成  
-・スクリプトから呼び出された際の処理を実装  
-・設定保存にレジストリを用いるよう実装  
-2015/10/06  
-・パス置換を実装  
-2015/09/21  
-・作成
+3. ネットワークパスへの置換を設定 (D:\\ -> \\\\CHIGIRA\\ 等)  
