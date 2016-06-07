@@ -9,14 +9,14 @@ jobname = "";
 ff = 0;
 ft = 0;
 priority = "50";
-fstr = "F:/render/";
-rstr = "\\\\USER/render/";
+fstr = "F:\render\";
+rstr = "\\\\USER\render\";
 #smb://
 
 server_ip = "192.168.1.5";
 server_group = "RENDER";
 server_count = 5;
-server_c4dloc = "C:\\Program Files\\MAXON\\CINEMA 4D R15\\CINEMA 4D 64 Bit.exe";
+server_c4dloc = "C:\\Program Files\\MAXON\\CINEMA 4D R17\\CINEMA 4D 64 Bit.exe";
 cmdjob = "C:\\Program Files (x86)\\Autodesk\\Backburner\\cmdjob.exe";
 #/usr/discreet/backburner/cmdjob
 
@@ -54,17 +54,19 @@ def Execute():
     # 引数
     rd = doc.GetActiveRenderData();
     cmd = cmdjob + ' -jobname '+ jobname + " -manager "+server_ip+" -priority " + priority + " -serverCount "+str(server_count)+" -group "+server_group +" -taskList \""+saveDir + os.sep + "tasklist.txt\" -taskname 1 -timeout 4320 ";
-    if(rd[c4d.RDATA_MULTIPASS_ENABLE]):
-        if(rd[c4d.RDATA_FRAMESTEP]>1):
-            cmd += "\"" + server_c4dloc + "\" -nogui -render \"" + path.replace(fstr, rstr) + "\" -frame %tp2 %tp3 " + rd[c4d.RDATA_FRAMESTEP] + "-oimage \"" + saveDir + os.sep + "results" + os.sep + doc.GetDocumentName().replace(".c4d", "") + "\" -omultipass \"" + saveDir + os.sep+"results" + os.sep + doc.GetDocumentName().replace(".c4d", "") + "\"";
-        else:
-            cmd += "\"" + server_c4dloc + "\" -nogui -render \"" + path.replace(fstr, rstr) + "\" -frame %tp2 %tp3 -oimage \"" + saveDir + os.sep + "results" + os.sep + doc.GetDocumentName().replace(".c4d", "") + "\" -omultipass \"" + saveDir + os.sep + "results" + os.sep + doc.GetDocumentName().replace(".c4d", "") + "\"";
-    else:
-        if(rd[c4d.RDATA_FRAMESTEP]>1):
-            cmd += "\"" + server_c4dloc + "\" -nogui -render \"" + path.replace(fstr, rstr) + "\" -frame %tp2 %tp3 " + rd[c4d.RDATA_FRAMESTEP] + " -oimage \"" + saveDir + os.sep + "results" + os.sep + doc.GetDocumentName().replace(".c4d", "") + "\"";
-        else:
-            cmd += "\"" + server_c4dloc + "\" -nogui -render \"" + path.replace(fstr, rstr) + "\" -frame %tp2 %tp3 -oimage \"" + saveDir + os.sep + "results" + os.sep + doc.GetDocumentName().replace(".c4d", "") + "\"";
 
+    if(rd[c4d.RDATA_FRAMESTEP]>1):
+        cmd += "\"" + server_c4dloc + "\" -nogui -render \"" + path.replace(fstr, rstr) + "\" -frame %tp2 %tp3 " + rd[c4d.RDATA_FRAMESTEP] + "-oimage \"" + saveDir + os.sep + "results" + os.sep + doc.GetDocumentName().replace(".c4d", "") + "\"";
+    else:
+        cmd += "\"" + server_c4dloc + "\" -nogui -render \"" + path.replace(fstr, rstr) + "\" -frame %tp2 %tp3 -oimage \"" + saveDir + os.sep + "results" + os.sep + doc.GetDocumentName().replace(".c4d", "") + "\"";
+
+    if(rd[c4d.RDATA_MULTIPASS_ENABLE]):
+        cmd += " -omultipass \"" + saveDir + os.sep+"results" + os.sep + doc.GetDocumentName().replace(".c4d", "") + "\""
+
+    if(takename != ""):
+        cmd += " -take \"" + takename + "\"";
+
+    #print cmd;
     subprocess.call(cmd, shell=False);
     return
 
@@ -82,6 +84,8 @@ class settings(gui.GeDialog):
         self.AddEditNumber(1005, c4d.BFH_LEFT, 200, 0);
         self.AddStaticText(1006, c4d.BFH_LEFT, 0, 0, 'End Frame', c4d.BORDER_NONE);
         self.AddEditNumber(1007, c4d.BFH_LEFT, 200, 0);
+        self.AddStaticText(1008, c4d.BFH_LEFT, 0, 0, 'Take name', c4d.BORDER_NONE);
+        self.AddEditText(1009, c4d.BFH_LEFT, 500, 0);
         self.AddStaticText(1010, c4d.BFH_LEFT, 0, 0, 'Priority', c4d.BORDER_NONE);
         self.AddEditNumber(1011, c4d.BFH_LEFT, 200, 0);
         self.AddStaticText(1012, c4d.BFH_LEFT, 0, 0, 'Path Replace(from)', c4d.BORDER_NONE);
@@ -97,7 +101,7 @@ class settings(gui.GeDialog):
         self.AddStaticText(1018, c4d.BFH_LEFT, 0, 0, 'Server Group', c4d.BORDER_NONE);
         self.AddEditText(1019, c4d.BFH_LEFT, 500, 0);
         self.AddStaticText(1020, c4d.BFH_LEFT, 0, 0, 'Server Counts', c4d.BORDER_NONE);
-        self.AddEditNumber(1021, c4d.BFH_LEFT, 200, 0);
+        self.AddEditNumberArrows(1021, c4d.BFH_LEFT, 200, 0);
         self.AddStaticText(1022, c4d.BFH_LEFT, 0, 0, 'Server C4D Path', c4d.BORDER_NONE);
         self.AddEditText(1023, c4d.BFH_LEFT, 500, 0);
 
@@ -111,11 +115,12 @@ class settings(gui.GeDialog):
         return False;
 
     def AskClose(self):
-        global path, jobname, ff, ft, priority, fstr, rstr, server_ip, server_group, server_count, server_c4dloc, cmdjob;
+        global path, jobname, ff, ft, takename, priority, fstr, rstr, server_ip, server_group, server_count, server_c4dloc, cmdjob;
         path = self.GetString(1001).replace("/", os.sep).replace("\\", os.sep);
         jobname = self.GetString(1003);
         ff = self.GetLong(1005);
         ft = self.GetLong(1007);
+        takename = self.GetString(1009);
         priority =self.GetString(1011);
         fstr = self.GetString(1013).replace("/", os.sep).replace("\\", os.sep);
         rstr = self.GetString(1015).replace("/", os.sep).replace("\\", os.sep);
