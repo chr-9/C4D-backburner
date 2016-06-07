@@ -9,8 +9,8 @@ jobname = "";
 ff = 0;
 ft = 0;
 priority = "50";
-fstr = "F:\render\";
-rstr = "\\\\USER\render\";
+fstr = "F:\\render\\";
+rstr = "\\\\USER\\render\\";
 #smb://
 
 server_ip = "192.168.1.5";
