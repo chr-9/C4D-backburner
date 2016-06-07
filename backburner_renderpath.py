@@ -22,11 +22,15 @@ cmdjob = "C:\\Program Files (x86)\\Autodesk\\Backburner\\cmdjob.exe";
 
 def Execute():
     global path, jobname, ff, ft, priority, fstr, rstr, server_ip, server_group, server_count, server_c4dloc, cmdjob;
+    rd = doc.GetActiveRenderData();
+    #saveDir = doc.GetDocumentPath().replace(fstr, rstr);
     fstr = fstr.replace("/", os.sep).replace("\\", os.sep);
     rstr = rstr.replace("/", os.sep).replace("\\", os.sep);
-    saveDir = doc.GetDocumentPath().replace(fstr, rstr);
-    if not os.path.exists(doc.GetDocumentPath()+os.sep+"results"):
-        os.mkdir(doc.GetDocumentPath()+os.sep+"results");
+
+    saveDir = rd[c4d.RDATA_PATH].replace(fstr, rstr);
+    #if not os.path.exists(doc.GetDocumentPath()+os.sep+"results"):
+        #os.mkdir(doc.GetDocumentPath()+os.sep+"results");
+
     saveDir = saveDir.replace("/", os.sep).replace("\\", os.sep);
 
     # tasklist生成
@@ -51,23 +55,23 @@ def Execute():
     f = open(doc.GetDocumentPath()+os.sep+"tasklist.txt","w");
     f.write(tasklist);
     f.close();
+    tasklistpath = doc.GetDocumentPath() + "/";
 
     # 引数
-    rd = doc.GetActiveRenderData();
-    cmd = cmdjob + ' -jobname '+ jobname + " -manager "+server_ip+" -priority " + priority + " -serverCount "+str(server_count)+" -group "+server_group +" -taskList \""+saveDir + os.sep + "tasklist.txt\" -taskname 1 -timeout 4320 ";
+    cmd = cmdjob + " -jobname " + jobname + " -manager "+server_ip+" -priority " + priority + " -serverCount "+str(server_count)+" -group "+server_group +" -taskList \"" + tasklistpath.replace("/", os.sep).replace("\\", os.sep).replace(fstr, rstr) + "tasklist.txt\" -taskname 1 -timeout 4320 ";
 
     if(rd[c4d.RDATA_FRAMESTEP]>1):
-        cmd += "\"" + server_c4dloc + "\" -nogui -render \"" + path.replace(fstr, rstr) + "\" -frame %tp2 %tp3 " + rd[c4d.RDATA_FRAMESTEP] + "-oimage \"" + saveDir + os.sep + "results" + os.sep + doc.GetDocumentName().replace(".c4d", "") + "\"";
+        cmd += "\"" + server_c4dloc + "\" -nogui -render \"" + path.replace(fstr, rstr) + "\" -frame %tp2 %tp3 " + rd[c4d.RDATA_FRAMESTEP] + "-oimage \"" + saveDir + "\"";
     else:
-        cmd += "\"" + server_c4dloc + "\" -nogui -render \"" + path.replace(fstr, rstr) + "\" -frame %tp2 %tp3 -oimage \"" + saveDir + os.sep + "results" + os.sep + doc.GetDocumentName().replace(".c4d", "") + "\"";
+        cmd += "\"" + server_c4dloc + "\" -nogui -render \"" + path.replace(fstr, rstr) + "\" -frame %tp2 %tp3 -oimage \"" + saveDir + "\"";
 
     if(rd[c4d.RDATA_MULTIPASS_ENABLE]):
-        cmd += " -omultipass \"" + saveDir + os.sep+"results" + os.sep + doc.GetDocumentName().replace(".c4d", "") + "\""
+        cmd += " -omultipass \"" + rd[c4d.RDATA_MULTIPASS_FILENAME].replace("/", os.sep).replace("\\", os.sep).replace(fstr, rstr) + "\""
 
     if(takename != ""):
         cmd += " -take \"" + takename + "\"";
 
-    #print cmd;
+    print "[C4D_BB] "+cmd;
     subprocess.call(cmd, shell=False);
     return
 
